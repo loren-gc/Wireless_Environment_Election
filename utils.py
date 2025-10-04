@@ -39,6 +39,9 @@ def environment_setup(program_process_id, capacity, neighbours):
     server_port = process_id+BASE_PORT
     process_capacity = capacity
     election = Election(None, None, None, False, neighbours, process_capacity)
+    print(election.get_neighbours_amount())
+    print(election.get_neighbours())
+    print(election.get_neighbours_index(1))
     
 def send_payload(payload, destiny_port):
     try:

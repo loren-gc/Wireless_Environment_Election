@@ -23,11 +23,18 @@ class Election:
     def _put_concluded(self, concluded):
         self._concluded = concluded
         
+    def _put_neighbours(self, neighbours):
+        self._neighbours = neighbours
+    
     def _put_neighbours_amount(self, neighbours):
         if neighbours == None:
-            return 0
-        else return len(neighbours)
-
+            self._neighbours_amount = 0
+        else:
+            self._neighbours_amount = len(neighbours)
+    
+    def _put_capacity(self, capacity):
+        self._capacity = capacity
+    
     def get_election_id(self):
         return self._election_id
     
@@ -42,6 +49,9 @@ class Election:
     
     def get_neighbours(self):
         return self._neighbours
+    
+    def get_neighbours_index(self, index):
+        return self._neighbours[index]
     
     def get_neighbours_amount(self):
         return self._neighbours_amount
