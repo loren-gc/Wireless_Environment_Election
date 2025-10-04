@@ -17,7 +17,7 @@ lock = threading.Lock()
 # Constants imported from the process
 process_id = 0
 server_port = 0
-neighbours = []
+process_capacity = 0
 
 PROCESSES_AMOUNT = 10
 BASE_PORT = 5050
@@ -32,4 +32,19 @@ class Message(IntEnum):
     COORDINATOR = 3
 
 ########################################### FUNCTIONS AND PROCEDURES ##########################################
-
+############################ GENERAL PROCEDURES AND FUNCTIONS
+def environment_setup(program_process_id, capacity, neighbours):
+    global process_id, server_port, process_capacity
+    process_id = program_process_id
+    server_port = process_id+BASE_PORT
+    process_capacity = capacity
+    election = Election(None, None, None, False, neighbours, process_capacity)
+    
+def send_payload(payload, destiny_port):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((GENERAL_ADDRESS, destiny_port))
+        s.sendall(payload)
+        s.close()
+    except:
+        pass
