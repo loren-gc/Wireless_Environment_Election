@@ -4,6 +4,7 @@
 class Election:
     def __init__(self, electionId, leader, parent, concluded, neighbours, capacity):
         self._neighboursAmount = 0
+        self._ackCounter = 0
         self.update(electionId, leader, parent, concluded, neighbours, capacity)
     
     def update(self, electionId, leader, parent, concluded, neighbours, capacity):
@@ -14,7 +15,8 @@ class Election:
         self._putNeighbours(neighbours)
         self._putNeighboursAmount(neighbours)
         self._putCapacity(capacity)
-    
+ 
+#################################################### PUTS
     def _putElectionId(self, election_id):
         self._electionId = election_id
 
@@ -38,7 +40,8 @@ class Election:
     
     def _putCapacity(self, capacity):
         self._capacity = capacity
-    
+
+#################################################### GETS
     def getElectionId(self):
         return self._electionId
     
@@ -56,6 +59,16 @@ class Election:
     
     def getNeighboursAmount(self):
         return self._neighboursAmount
+        
+    def getAckCounter(self):
+        return self._ackCounter
+
+#################################################### OTHERS
+    def increaseAckCounter(self):
+        self._ackCounter += 1
+        
+    def resetAckCounter(self):
+        self._ackCounter = 0
     
     def isConcluded(self):
         return self._concluded
