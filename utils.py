@@ -60,12 +60,16 @@ def send_payload(payload, destiny_port):
 
 #################################################### SERVER
 def handle_election(message):
+    # Check if theres another election with higher election_id occurring
+    # discard the election with lower priority
     print("")
 
 def handle_ack(message):
+    # check ackCounter
     print("")
 
 def handle_coordinator(message):
+    # change the coordinator
     print("")
 
 def handle_message(message):
@@ -105,8 +109,11 @@ def client():
         start_election = input("\nPress 'y' if you want to start an election!!\n")
         if start_election == 'y':
             with lock: # UPDATE THE ELECTION OBJECT WITH THE CURRENT PROCESS INFOS
-                election_id = int(time.time() * 1000)
-                election.update(election_id, None, process_id, False, election.getNeighbours(), process_capacity)
+                # Check if theres another election with higher election_id occurring
+                # if not, send the election to all the neighbours
+                
+                #election_id = int(time.time() * 1000)
+                #election.update(election_id, None, process_id, False, election.getNeighbours(), process_capacity)
             #election_test()
         time.sleep(ELECTION_WAIT_TIME)
 
