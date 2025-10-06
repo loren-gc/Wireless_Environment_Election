@@ -7,8 +7,6 @@ import queue
 import json
 import time
 from enum import IntEnum
-import signal
-import sys
 from Election import *
 
 ################################################## CONSTANTS ##################################################
@@ -18,6 +16,9 @@ lock = threading.Lock()
 process_id = 0
 server_port = 0
 process_capacity = 0
+
+election = None
+ELECTION_WAIT_TIME = 5
 
 PROCESSES_AMOUNT = 10
 BASE_PORT = 5050
@@ -33,15 +34,20 @@ class Message(IntEnum):
 
 ########################################### FUNCTIONS AND PROCEDURES ##########################################
 ############################ GENERAL PROCEDURES AND FUNCTIONS
+def election_test():
+    global election
+    with lock:
+        print(election.getNeighboursAmount())
+        print(election.getNeighbours())
+        print(election.getNeighbour(1))
+
 def environment_setup(program_process_id, capacity, neighbours):
-    global process_id, server_port, process_capacity
+    global process_id, server_port, process_capacity, election
     process_id = program_process_id
     server_port = process_id+BASE_PORT
     process_capacity = capacity
     election = Election(None, None, None, False, neighbours, process_capacity)
-    print(election.get_neighbours_amount())
-    print(election.get_neighbours())
-    print(election.get_neighbours_index(1))
+    election_test()
     
 def send_payload(payload, destiny_port):
     try:
@@ -51,3 +57,56 @@ def send_payload(payload, destiny_port):
         s.close()
     except:
         pass
+
+#################################################### SERVER
+def handle_election(message):
+    print("")
+
+def handle_ack(message):
+    print("")
+
+def handle_coordinator(message):
+    print("")
+
+def handle_message(message):
+    t = message["type"]
+    if t == Message.ELECTION:
+        handle_election(messsage)
+    elif t == Message.ACK:
+        handle_ack(message)
+    else:
+        handle_coordinator(message)
+
+def handle_client(conn, addr):
+    try:
+        data = conn.recv(1024)
+        message = json.loads(data.decode("utf-8"))
+        handle_message(message)
+    except json.JSONDecodeError:
+        print(f"[{addr}] Error: Invalid JSON!")
+    finally:
+        conn.close()
+
+def server():
+    global server_port, SERVER_IP
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind((SERVER_IP, server_port))
+    server.listen()
+    while True:
+        conn, addr = server.accept()
+        # thread to handle the client:
+        thread = threading.Thread(target=handle_client, args=(conn, addr), daemon=True)
+        thread.start()
+
+#################################################### CLIENT
+def client():
+    global process_id, election, neighbours, process_capacity
+    while True:
+        start_election = input("\nPress 'y' if you want to start an election!!\n")
+        if start_election == 'y':
+            with lock: # UPDATE THE ELECTION OBJECT WITH THE CURRENT PROCESS INFOS
+                election_id = int(time.time() * 1000)
+                election.update(election_id, None, process_id, False, election.getNeighbours(), process_capacity)
+            #election_test()
+        time.sleep(ELECTION_WAIT_TIME)
+
