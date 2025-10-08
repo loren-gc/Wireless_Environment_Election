@@ -5,12 +5,6 @@ class Election:
     def __init__(self, electionId, parent, inElection, capacity):
         self._ackCounter = 0
         self.update(electionId, parent, inElection, capacity)
-    
-    def update(self, electionId, parent, inElection, capacity):
-        self._putElectionId(electionId)
-        self._putParent(parent)
-        self._putInElection(inElection)
-        self._putCapacity(capacity)
  
 #################################################### PUTS
     def _putElectionId(self, election_id):
@@ -38,14 +32,16 @@ class Election:
     def getAckCounter(self):
         return self._ackCounter
 
-#################################################### OTHERS
-    def test(self): # Procedure to test the election object
-        if not self.isInElection():
-            print("Not in election!!!")
-        else:
-            print("Election id = ", self.getElectionId())
-            print("Parent id = ", self.getParent)
-        print("current max capacity = ", self.getCapacity())
+#################################################### OTHERS        
+    def update(self, electionId, parent, inElection, capacity):
+        self._putElectionId(electionId)
+        self._putParent(parent)
+        self._putInElection(inElection)
+        self._putCapacity(capacity)
+    
+    def reset(self, capacity):
+        self.resetAckCounter()
+        self.update(None, None, False, capacity)
     
     def increaseAckCounter(self):
         self._ackCounter += 1
@@ -55,4 +51,12 @@ class Election:
     
     def isInElection(self):
         return self._inElection
+
+    def test(self): # Procedure to test the election object
+        if not self.isInElection():
+            print("Not in election!!!")
+        else:
+            print("Election id = ", self.getElectionId())
+            print("Parent id = ", self.getParent)
+        print("current max capacity = ", self.getCapacity())
 
