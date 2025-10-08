@@ -55,9 +55,22 @@ def send_payload(payload, destiny_port):
     except:
         pass
 
-#################################################### SERVER
+################################################### ELECTION
 def send_coordinator(coordinator):
     print("")
+
+def handle_coordinator(message):
+    # change the coordinator
+    # reset the election object
+    print("")
+
+def check_election():
+    global process_id, election
+    with lock:
+        if election.getParent() == process_id:
+            send_coordinator(election.getCapacityOwner())
+        else:
+            send_ack(election.getParent())
 
 def send_ack(destiny_process_id):
     global election
@@ -75,13 +88,19 @@ def send_ack(destiny_process_id):
     destiny_port = BASE_PORT+destiny_process_id
     send_payload(payload, destiny_port)
 
-def check_election():
-    global process_id, election
+def handle_ack(ack_message):
+    # check if the ack corresponds to the current election
+    # update the election capacity  and its owner, if necessary
+    # check ackCounter
+    global election, neighbours_amount
     with lock:
-        if election.getParent() == process_id:
-            send_coordinator(election.getCapacityOwner())
-        else:
-            send_ack(election.getParent())
+        if ack_message["election_id"] != election.getElectionId():
+            return
+        if ack_message["capacity"] > election.getCapacity():
+            election.putCapacity(ack_message["capacity"])
+            election.putCapacityOwner(ack_message["capacity_owner"])
+        if election.getAckCounter() == neighbours_amount:
+            check_election()
 
 def propagate_election(election_message):
     global process_id, election, process_neighbours
@@ -110,24 +129,7 @@ def handle_election(election_message):
         if election.getAckCounter() == neighbours_amount:
             send_ack(election.getParent())
 
-def handle_ack(ack_message):
-    # check if the ack corresponds to the current election
-    # update the election capacity if necessary
-    # check ackCounter
-    global election, neighbours_amount
-    with lock:
-        if ack_message["election_id"] != election.getElectionId():
-            return
-        if ack_message["capacity"] > election.getCapacity():
-            election.putCapacityOwner(ack_message["capacity_owner"])
-        if election.getAckCounter() == neighbours_amount:
-            check_election()
-
-def handle_coordinator(message):
-    # change the coordinator
-    # reset the election object
-    print("")
-
+#################################################### SERVER
 def handle_message(message):
     t = message["type"]
     if t == Message.ELECTION:
@@ -154,7 +156,6 @@ def server():
     server.listen()
     while True:
         conn, addr = server.accept()
-        # thread to handle the client:
         thread = threading.Thread(target=handle_client, args=(conn, addr), daemon=True)
         thread.start()
 
