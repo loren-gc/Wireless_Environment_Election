@@ -2,9 +2,9 @@
 # João Vitor Seiji - 822767
 
 class Election:
-    def __init__(self, electionId, parent, inElection, capacity):
+    def __init__(self, electionId, parent, inElection, capacity, capacityOwner):
         self._ackCounter = 0
-        self.update(electionId, parent, inElection, capacity)
+        self.update(electionId, parent, inElection, capacity, capacityOwner)
  
 #################################################### PUTS
     def _putElectionId(self, election_id):
@@ -18,6 +18,9 @@ class Election:
     
     def _putCapacity(self, capacity):
         self._capacity = capacity
+        
+    def _putCapacityOwner(self, capacityOwner):
+        self._capacityOwner = capacityOwner
 
 #################################################### GETS
     def getElectionId(self):
@@ -29,19 +32,23 @@ class Election:
     def getCapacity(self):
         return self._capacity
         
+    def getCapacityOwner(self):
+        return self._capacityOwner
+        
     def getAckCounter(self):
         return self._ackCounter
 
 #################################################### OTHERS        
-    def update(self, electionId, parent, inElection, capacity):
+    def update(self, electionId, parent, inElection, capacity, capacityOwner):
         self._putElectionId(electionId)
         self._putParent(parent)
         self._putInElection(inElection)
         self._putCapacity(capacity)
+        self._putCapacityOwner(capacityOwner)
     
     def reset(self, capacity):
         self.resetAckCounter()
-        self.update(None, None, False, capacity)
+        self.update(None, None, False, capacity, capacityOwner)
     
     def increaseAckCounter(self):
         self._ackCounter += 1
@@ -59,4 +66,5 @@ class Election:
             print("Election id = ", self.getElectionId())
             print("Parent id = ", self.getParent)
         print("current max capacity = ", self.getCapacity())
+        print("currents capacity owner = ", self.getCapacityOwner())
 
