@@ -16,9 +16,11 @@ lock = threading.Lock()
 process_id = 0
 server_port = 0
 process_capacity = 0
+process_neighbours = None
 
 election = None
 ELECTION_WAIT_TIME = 5
+leader = None
 
 PROCESSES_AMOUNT = 10
 BASE_PORT = 5050
@@ -34,20 +36,14 @@ class Message(IntEnum):
 
 ########################################### FUNCTIONS AND PROCEDURES ##########################################
 ############################ GENERAL PROCEDURES AND FUNCTIONS
-def election_test():
-    global election
-    with lock:
-        print(election.getNeighboursAmount())
-        print(election.getNeighbours())
-        print(election.getNeighbour(1))
-
 def environment_setup(program_process_id, capacity, neighbours):
-    global process_id, server_port, process_capacity, election
+    global process_id, server_port, process_capacity, process_neighbours, election
     process_id = program_process_id
     server_port = process_id+BASE_PORT
     process_capacity = capacity
-    election = Election(None, None, None, False, neighbours, process_capacity)
-    election_test()
+    process_neighbours = neighbours
+    election = Election(None, None, False, process_capacity)
+    election.test()
     
 def send_payload(payload, destiny_port):
     try:
@@ -59,14 +55,24 @@ def send_payload(payload, destiny_port):
         pass
 
 #################################################### SERVER
+def propagate_election(election_message):
+    global process_id, process_neighbours
+    election_message["process_id"] = process_id
+    payload = json.dumps(election_message).encode("utf-8")
+    for neighbour in process_neighbours:
+        send_payload(payload, BASE_PORT+neighbour)
+
 def handle_election(message):
+    global election
     # Check if theres another election with higher election_id occurring
     # discard the election with lower priority
     global election
-    if election.isConcluded(): # not in election
-        print("")
-    else: # in election
-        print("")
+    if election.isInElection() and election.getElectionId() < message["election_id"]:
+            election.update(message["election_id"], message["process_id"], True, process_capacity)
+            propagate_election(message)
+    elif not election.isInElection(): # Not in election
+        election.update(message["election_id"], message["process_id"], True, process_capacity)
+        propagate_election(message)
 
 def handle_ack(message):
     # check ackCounter
@@ -108,16 +114,17 @@ def server():
 
 #################################################### CLIENT
 def client():
-    global process_id, election, neighbours, process_capacity
+    global process_id, election, process_neighbours, process_capacity
     while True:
         start_election = input("\nPress 'y' if you want to start an election!!\n")
         if start_election == 'y':
             with lock: # UPDATE THE ELECTION OBJECT WITH THE CURRENT PROCESS INFOS
+                print("hey")
                 # Check if theres another election with higher election_id occurring
                 # if not, send the election to all the neighbours
                 
                 #election_id = int(time.time() * 1000)
-                #election.update(election_id, None, process_id, False, election.getNeighbours(), process_capacity)
+                #election.update(election_id, process_id, False, process_capacity)
             #election_test()
         time.sleep(ELECTION_WAIT_TIME)
 
