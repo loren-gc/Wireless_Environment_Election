@@ -56,19 +56,31 @@ def send_payload(payload, destiny_port):
         pass
 
 ################################################### ELECTION
-def send_coordinator(coordinator):
-    print("")
+def propagate_coordinator(new_coordinator):
+    global process_neighbours
+    coordinator_message = {
+        'type': Message.COORDINATOR,
+        'new_coordinator': new_coordinator
+    }
+    payload = json.dumps(coordinator_message).encode("utf-8")
+    for neighbour in process_neighbours:
+        send_payload(payload, BASE_PORT+neighbour)
 
-def handle_coordinator(message):
+def handle_coordinator(coordinator_message):
     # change the coordinator
-    # reset the election object
-    print("")
+    # reset the election object, setting the election to concluded
+    global election, coordinator_id
+    with lock:
+        if election.isInElection():
+            election.putInElection(False)
+            coordinator_id = coordinator_message["new_coordinator"]
+            propagate_coordinator(coordintaor_id)
 
 def check_election():
     global process_id, election
     with lock:
         if election.getParent() == process_id:
-            send_coordinator(election.getCapacityOwner())
+            propagate_coordinator(election.getCapacityOwner())
         else:
             send_ack(election.getParent())
 
@@ -123,6 +135,7 @@ def handle_election(election_message):
             election.increaseAckCounter()
             election.update(election_message["election_id"], election_message["process_id"], True, process_capacity)
             election_message["process_id"] = process_id
+            time.sleep(ELECTION_WAIT_TIME)
             propagate_election(election_message)
         elif election.isInElection() and election.getElectionId() == election_message["election_id"]:
             send_ack(election_message["process_id"])
