@@ -8,7 +8,7 @@ from utils import environment_setup, server, client
 
 # process variables
 PROCESS_ID = 0
-NEIGHBOURS = [2, 7]
+NEIGHBOURS = [1, 6]
 
 ################################################################# MAIN #################################################################
 
