@@ -13,8 +13,7 @@ NEIGHBOURS = [1, 6]
 ################################################################# MAIN #################################################################
 
 if __name__ == "__main__":
-    #capacity = int(input("Please enter this process' capacity:\n"))
-    capacity = PROCESS_ID+1
+    capacity = int(input("Please enter this process' capacity:\n"))
     environment_setup(PROCESS_ID, capacity, NEIGHBOURS)
     # Starting threads:
     thread1 = threading.Thread(target=server)

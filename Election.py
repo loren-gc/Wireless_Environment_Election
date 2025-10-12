@@ -7,19 +7,19 @@ class Election:
         self.update(electionId, parent, inElection, capacity, capacityOwner)
  
 #################################################### PUTS
-    def _putElectionId(self, election_id):
+    def putElectionId(self, election_id):
         self._electionId = election_id
         
-    def _putParent(self, parent):
+    def putParent(self, parent):
         self._parent = parent
         
-    def _putInElection(self, inElection):
+    def putInElection(self, inElection):
         self._inElection = inElection
     
-    def _putCapacity(self, capacity):
+    def putCapacity(self, capacity):
         self._capacity = capacity
         
-    def _putCapacityOwner(self, capacityOwner):
+    def putCapacityOwner(self, capacityOwner):
         self._capacityOwner = capacityOwner
 
 #################################################### GETS
@@ -40,13 +40,13 @@ class Election:
 
 #################################################### OTHERS        
     def update(self, electionId, parent, inElection, capacity, capacityOwner):
-        self._putElectionId(electionId)
-        self._putParent(parent)
-        self._putInElection(inElection)
-        self._putCapacity(capacity)
-        self._putCapacityOwner(capacityOwner)
+        self.putElectionId(electionId)
+        self.putParent(parent)
+        self.putInElection(inElection)
+        self.putCapacity(capacity)
+        self.putCapacityOwner(capacityOwner)
     
-    def reset(self, capacity):
+    def reset(self, capacity, capacityOwner):
         self.resetAckCounter()
         self.update(None, None, False, capacity, capacityOwner)
     
