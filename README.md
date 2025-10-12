@@ -1,6 +1,10 @@
 # Wireless_Environment_Election
 Implementation of a leader election algorithm for wireless ad hoc networks, discussed in Tanenbaum’s Distributed Systems.
 
+## Topology
+![Network topology](images/topology.png)
+
+
 ## 🚀 How to run
 
 Use the command to simultaneously run the 10 processes:

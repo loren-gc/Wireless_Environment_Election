@@ -46,6 +46,7 @@ def environment_setup(program_process_id, capacity, neighbours):
     election = Election(None, None, False, process_capacity, process_id)
     
 def send_payload(payload, destiny_port):
+    """
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((GENERAL_ADDRESS, destiny_port))
     s.sendall(payload)
@@ -57,8 +58,8 @@ def send_payload(payload, destiny_port):
         s.sendall(payload)
         s.close()
     except:
+        print("não enviou")
         pass
-    """
 
 ################################################### ELECTION
 def propagate_coordinator(new_coordinator):
@@ -125,10 +126,9 @@ def propagate_election(election_message):
     global process_id, election, process_neighbours
     election_message["process_id"] = process_id
     payload = json.dumps(election_message).encode("utf-8")
-    with lock:
-        current_parent = election.getParent()
+    current_parent = election.getParent()
     for neighbour in process_neighbours:
-        print("banan")
+        print("\nelection propagated to", neighbour)
         if neighbour != current_parent:
             send_payload(payload, BASE_PORT+neighbour)
 
@@ -136,6 +136,7 @@ def handle_election(election_message):
     # Check if theres another election with higher election_id occurring
     # check if the incoming election message corresponds to the current election
     # discard the election with lower priority
+    print("\nelection message arrived from", election_message["process_id"])
     global election, process_id, neighbours_amount, process_capacity
     with lock:
         if (not election.isInElection()) or election.getElectionId() < election_message["election_id"]:
@@ -150,7 +151,7 @@ def handle_election(election_message):
             election.increaseAckCounter()
             send_ack(election_message["process_id"])
         elif election.getElectionId() > election_message["election_id"]:
-            print(f"\nElection with id {election_message["election_id"]} arrived, but the current election has a higher id!!")
+            print("\nElection with id", election_message["election_id"], "arrived, but the current election has a higher id!!")
             return
         if election.getAckCounter() == neighbours_amount:
             send_ack(election.getParent())
@@ -194,6 +195,7 @@ def create_election_message(election_id):
         'election_id': election_id,
         'process_id': process_id
     }
+    print(f"\nElection with id {election_id} created!!")
     return election_message
 
 def client():
@@ -201,7 +203,6 @@ def client():
     while True:
         start_election = input("\nPress 'y' if you want to start an election!!\n")
         if start_election == 'y':
-            print("wbwubdubdwud")
             with lock:
                 # If there ISN'T another election with higher election_id occurring:
                 # send the election to all the neighbours;
@@ -209,7 +210,7 @@ def client():
                 election_id = int(time.time() * 1000)
                 if (not election.isInElection()) or election_id > election.getElectionId():
                     election_message = create_election_message(election_id)
-                    print("bwsvwsy")
-            propagate_election(election_message)
+                print("\nPropagating created election!!")
+                propagate_election(election_message)
         time.sleep(ELECTION_WAIT_TIME)
 
