@@ -136,12 +136,12 @@ def handle_election(election_message):
     # Check if theres another election with higher election_id occurring
     # check if the incoming election message corresponds to the current election
     # discard the election with lower priority
-    global election, process_id, neighbours_amount
+    global election, process_id, neighbours_amount, process_capacity
     with lock:
         if (not election.isInElection()) or election.getElectionId() < election_message["election_id"]:
             election.resetAckCounter()
             election.increaseAckCounter()
-            election.update(election_message["election_id"], election_message["process_id"], True, process_capacity)
+            election.update(election_message["election_id"], election_message["process_id"], True, process_capacity, process_id)
             election_message["process_id"] = process_id
             print(f"\nNew election with id {election.getElectionId()} detected!!\nPropagating election...")
             time.sleep(ELECTION_WAIT_TIME)
@@ -159,7 +159,7 @@ def handle_election(election_message):
 def handle_message(message):
     t = message["type"]
     if t == Message.ELECTION:
-        handle_election(messsage)
+        handle_election(message)
     elif t == Message.ACK:
         handle_ack(message)
     else:
