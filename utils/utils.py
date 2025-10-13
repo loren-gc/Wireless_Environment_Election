@@ -9,12 +9,6 @@ import time
 from enum import IntEnum
 from .Election import Election
 
-"""
-import os
-import sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-"""
-
 ################################################## CONSTANTS ##################################################
 lock = threading.Lock()
 

@@ -2,7 +2,12 @@
 # João Vitor Seiji - 822767
 
 import threading
-from utils import environment_setup, server, client
+import sys
+import os
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from utils import utils
+from utils.utils import environment_setup, server, client
 
 ############################################################### CONSTANTS ##############################################################
 
