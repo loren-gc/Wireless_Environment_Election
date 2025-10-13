@@ -45,12 +45,6 @@ def environment_setup(program_process_id, capacity, neighbours):
     election = Election(None, None, False, process_capacity, process_id)
     
 def send_payload(payload, destiny_port):
-    """
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((GENERAL_ADDRESS, destiny_port))
-    s.sendall(payload)
-    s.close()
-    """
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((GENERAL_ADDRESS, destiny_port))
@@ -83,9 +77,13 @@ def handle_coordinator(coordinator_message):
             propagate_coordinator(coordinator_id)
 
 def check_election():
-    global process_id, election
-    if election.getParent() == process_id:
-        propagate_coordinator(election.getCapacityOwner())
+    global process_id, election, coordinator_id, process_capacity
+    if election.getParent() == process_id: # Election reached its source
+        new_coordinator = election.getCapacityOwner()
+        coordinator_id = new_coordinator
+        election.reset(process_capacity, process_id)
+        print(f"\nThe new coordinator is process {coordinator_id+1}")
+        propagate_coordinator(new_coordinator)
     else:
         send_ack(election.getParent())
 
@@ -110,6 +108,7 @@ def handle_ack(ack_message):
     # check if the ack corresponds to the current election
     # update the election capacity  and its owner, if necessary
     # check ackCounter
+    print("\nAck received!!")
     global election, neighbours_amount
     with lock:
         election.increaseAckCounter()

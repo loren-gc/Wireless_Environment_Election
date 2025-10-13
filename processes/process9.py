@@ -14,12 +14,12 @@ from utils.utils import environment_setup, server, client
 # process variables
 PROCESS_ID = 8
 NEIGHBOURS = [7, 9]
+CAPACITY = 9
 
 ################################################################# MAIN #################################################################
 
 if __name__ == "__main__":
-    capacity = int(input("Please enter this process' capacity:\n"))
-    environment_setup(PROCESS_ID, capacity, NEIGHBOURS)
+    environment_setup(PROCESS_ID, CAPACITY, NEIGHBOURS)
     # Starting threads:
     thread1 = threading.Thread(target=server)
     thread2 = threading.Thread(target=client)
