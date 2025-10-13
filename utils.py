@@ -149,7 +149,7 @@ def handle_election(election_message):
             send_ack(election_message["process_id"])
         elif election.getElectionId() > election_message["election_id"]:
             print("\nElection with id", election_message["election_id"], end='') 
-            print("arrived, from node", election_message["process_id"]+1, "but the current election has a higher id!!")
+            print(" arrived, from node", election_message["process_id"]+1, "but the current election has a higher id!!")
             return
         if election.getAckCounter() == neighbours_amount:
             send_ack(election.getParent())
